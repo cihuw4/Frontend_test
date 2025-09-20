@@ -1,103 +1,103 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useEffect, useMemo, useState } from "react";
+
+type Product = {
+  id: string;
+  name: string;
+  price: number;
+  stock: number; 
+};
+
+function uid() {
+  return Math.random().toString(36).slice(2, 9);
+}
+
+export default function Home() { 
+  const [products, setProducts] = useState<Product[] | null>(null);
+
+  // loading
+  useEffect(() => {
+    setProducts(null);
+    const t = setTimeout(() => {
+      const raw = localStorage.getItem("products_v1");
+      setProducts(raw ? JSON.parse(raw) : []);
+    }, 600);
+    return () => clearTimeout(t);
+  }, []);
+
+  // localStorage
+  useEffect(() => {
+    if (products !== null) {
+      localStorage.setItem("products_v1", JSON.stringify(products));
+    }
+  }, [products]);
+
+  const addDummy = () => {
+    const newP: Product = {
+      id: uid(),
+      name: "Produk " + (products?.length || 0 + 1),
+      price: Math.floor(Math.random() * 100000),
+      stock: Math.floor(Math.random() * 50),
+    };
+    setProducts((prev) => (prev ? [newP, ...prev] : [newP]));
+  };
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="p-6 max-w-6xl mx-auto">
+      <header className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-semibold">Frontend Product</h1>
+        <button
+          onClick={addDummy}
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Tambah Produk
+        </button>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Loading */}
+      {products === null && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="p-4 border rounded animate-pulse space-y-2"
+            >
+              <div className="h-4 bg-gray-300 rounded w-3/4" />
+              <div className="h-3 bg-gray-300 rounded w-1/2" />
+              <div className="h-3 bg-gray-300 rounded w-1/3" />
+            </div>
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      )}
+
+      {/* empty state */}
+      {products !== null && products.length === 0 && (
+        <div className="text-center py-12">
+          <p className="mb-4">Belum ada produk.</p>
+          <button
+            onClick={addDummy}
+            className="bg-green-600 text-white px-4 py-2 rounded"
+          >
+            Tambah produk pertama
+          </button>
+        </div>
+      )}
+
+      {/* produk */}
+      {products !== null && products.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {products.map((p) => (
+            <div key={p.id} className="p-4 border rounded">
+              <h2 className="font-medium text-lg">{p.name}</h2>
+              <p className="text-sm text-gray-600">
+                Harga: Rp {p.price.toLocaleString()}
+              </p>
+              <p className="text-sm text-gray-600">Stok: {p.stock}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
